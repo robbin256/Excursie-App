@@ -1,128 +1,201 @@
 <!DOCTYPE html>
 <html lang="nl">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CMS - Beheer locaties</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body class="cms-page">
-    <main class="cms-shell">
-      <section class="cms-panel">
-        <div class="cms-header">
-          <div>
-            <p class="eyebrow">Admin CMS</p>
-            <h1>Beheer locaties voor Berlijn</h1>
-            <p class="cms-intro">
-              Voeg nieuwe bezienswaardigheden toe, pas bestaande aan of verwijder ze snel.
-            </p>
-          </div>
-          <a class="btn btn--secondary" href="index.html">Terug naar website</a>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CMS - Beheer locaties</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body class="cms-page">
+  <main class="cms-shell">
+    <section class="cms-panel">
+      <div class="cms-header">
+        <div>
+          <p class="eyebrow">Admin CMS</p>
+          <h1>Beheer locaties voor Berlijn</h1>
+          <p class="cms-intro">
+            Voeg nieuwe bezienswaardigheden toe, pas bestaande aan of verwijder ze snel.
+          </p>
         </div>
+        <a class="btn btn--secondary" href="index.html">Terug naar website</a>
+      </div>
 
-        <form id="location-form" class="cms-form">
-          <input type="hidden" id="location-id" />
+      <form id="location-form" class="cms-form">
+        <input type="hidden" id="location-id" />
 
-          <label class="field">
-            <span>Naam locatie</span>
-            <input id="location-name" name="locatie" type="text" required placeholder="Bijvoorbeeld Brandenburger Tor" />
-          </label>
+        <label class="field">
+          <span>Naam locatie</span>
+          <input id="location-name" name="locatie" type="text" required placeholder="Bijvoorbeeld Brandenburger Tor" />
+        </label>
 
-          <label class="field">
-            <span>Beschrijving</span>
-            <textarea id="location-description" name="beschrijving" rows="4" required placeholder="Schrijf een korte beschrijving voor studenten"></textarea>
-          </label>
+        <label class="field">
+          <span>Beschrijving</span>
+          <textarea id="location-description" name="beschrijving" rows="4" required
+            placeholder="Schrijf een korte beschrijving voor studenten"></textarea>
+        </label>
 
-          <div class="form-actions">
-            <button type="submit" class="btn btn--primary">Opslaan</button>
-            <button type="button" id="cancel-edit" class="btn btn--secondary is-hidden">Annuleren</button>
-          </div>
-        </form>
-
-        <div id="message" class="message" role="status" aria-live="polite"></div>
-
-        <div class="cms-list-header">
-          <h2>Bestaande locaties</h2>
-          <p id="location-count">0 locaties</p>
+        <div class="form-actions">
+          <button type="submit" class="btn btn--primary">Opslaan</button>
+          <button type="button" id="cancel-edit" class="btn btn--secondary is-hidden">Annuleren</button>
         </div>
-        <div id="loading" class="loading">Laden...</div>
-        <div id="locations-list" class="cms-list"></div>
-      </section>
-    </main>
-    <script>
+      </form>
 
-    const locationsList = document.getElementById('locations-list');
-    
+      <div id="message" class="message" role="status" aria-live="polite"></div>
 
+      <div class="cms-list-header">
+        <h2>Bestaande locaties</h2>
+        <p id="location-count">0 locaties</p>
+      </div>
+      <div id="loading" class="loading">Laden...</div>
+      <div id="locations-list" class="cms-list"></div>
+    </section>
+  </main>
+  <script>
 
-     fetch('./api/list.php')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                })
-                .catch(error => console.error('Error fetching locations:', error));
+    const form = document.getElementById("location-form");
+    const idInput = document.getElementById("location-id");
+    const nameInput = document.getElementById("location-name");
+    const descriptionInput = document.getElementById("location-description");
 
-            const container = document.getElementById('locations-list');
-            const loading = document.getElementById('loading');
+    const container = document.getElementById("locations-list");
+    const loading = document.getElementById("loading");
+    const message = document.getElementById("message");
+    const cancelBtn = document.getElementById("cancel-edit");
+    const count = document.getElementById("location-count");
 
-            async function fetchProducts() {
-                try {
-                    const response = await fetch('./api/list.php');
-                    if (!response.ok) throw new Error('Failed to load locations');
-                    const data = await response.json();
-                    allLocations = data.records;
-                    renderLocations(allLocations);
-                } catch (error) {
-
-                    console.error('Error fetching locations:', error);
-                    loading.innerHTML = `<div class="error-msg">Error: ${error.message}. Please make sure the API is running.</div>
-        `;
-                }
-            }
-
-           
-            function renderLocations(locations) {
-
-                loading.style.display = 'none';
-
-                for (const location of locations) {
-                    const sectionId = location.id;
-                    let section = document.getElementById(sectionId);
+    fetch('./api/list.php')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+      })
+      .catch(error => console.error('Error fetching locations:', error));
 
 
-                    if (!section) {
-                        section = document.createElement('div');
-                        section.className = 'category.location';
-                        section.id = sectionId;
+    async function fetchProducts() {
+      try {
+        const response = await fetch('./api/list.php');
+        if (!response.ok) throw new Error('Failed to load locations');
+        const data = await response.json();
+        allLocations = data.records;
+        renderLocations(allLocations);
+      } catch (error) {
 
-                        section.innerHTML = `
-            <article class="cms-item">
-              <div>
-                <h3>${location.locatie}</h3>
-                <p>${location.beschrijving}</p>
-              </div>
-              <div class="cms-item__actions">
-                <button type="button" class="btn btn--secondary" data-action="edit" data-id="${location.id}">Bewerken</button>
-                <button type="button" class="btn btn--primary" data-action="delete" data-id="${location.id}">Verwijderen</button>
-              </div>
-            </article>
-        `;
-                        container.appendChild(section);
-                    }
-                }
-            }
+        console.error('Error fetching locations:', error);
+        loading.innerHTML = `<div class="error-msg">Error: ${error.message}. Please make sure the API is running.</div>
+`;
+      }
+    }
 
-        fetchProducts();
-    </script>     
-  </body>
+
+    function renderLocations(locations) {
+
+      loading.style.display = 'none';
+
+      for (const location of locations) {
+        const sectionId = location.id;
+        let section = document.getElementById(sectionId);
+
+
+        if (!section) {
+          section = document.createElement('div');
+          section.className = 'category.location';
+          section.id = sectionId;
+
+          section.innerHTML = `
+          <article class="cms-item">
+            <div>
+              <h3>${location.locatie}</h3>
+              <p>${location.beschrijving}</p>
+            </div>
+            <div class="cms-item__actions">
+              <button type="button" class="btn btn--primary delete-btn" data-action="delete" data-id="${location.id}">Verwijderen</button>
+            </div>
+          </article>
+          `;
+          container.appendChild(section);
+        }
+        document.querySelectorAll(".delete-btn").forEach(btn => {
+          btn.addEventListener("click", deleteLocation);
+        });
+      }
+    }
+
+    function resetForm() {
+
+      form.reset();
+
+      idInput.value = "";
+
+      cancelBtn.classList.add("is-hidden");
+
+    }
+
+    form.addEventListener("submit", async function (e) {
+
+      e.preventDefault();
+
+      const formData = new FormData();
+
+      formData.append("locatie", nameInput.value);
+      formData.append("beschrijving", descriptionInput.value);
+
+      let url = "./api/create.php";
+
+      if (idInput.value) {
+
+        url = "./api/update.php";
+        formData.append("id", idInput.value);
+
+      }
+
+      const response = await fetch(url, {
+        method: "POST",
+        body: formData
+      });
+
+      const result = await response.json();
+
+      message.textContent = result.message || "Opgeslagen.";
+
+      resetForm();
+
+      renderLocations(allLocations);
+
+    });
+
+
+
+    fetchProducts();
+    async function deleteLocation() {
+
+      if (!confirm("Weet je zeker dat je deze locatie wilt verwijderen?")) {
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("id", this.dataset.id);
+      const response = await fetch("./api/delete.php", {
+        method: "POST",
+        body: formData
+      });
+
+      const result = await response.json();
+
+      message.textContent = result.message || "Verwijderd.";
+
+      renderLocations(allLocations);
+
+    }
+  </script>
+</body>
+
 </html>
